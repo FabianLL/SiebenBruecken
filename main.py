@@ -1,79 +1,79 @@
 from geodist import geodist
 
-def introduceProgram():
-	return ""
+def einfuehrung():
+	print("")
 
-def getCoordsFromUser():
-	long = 0
-	lat = 0
-	inputCorrect = False
-	while not inputCorrect:
+def koordinatenEingabe():
+	laengengrad = 0
+	breitengrad = 0
+	eingabeRichtig = False
+	while not eingabeRichtig:
 		try:
-			long = float(input("Geben Sie einen Längengrad ein: "))
-			lat = float(input("Geben Sie einen Breitengrad ein: "))
-			inputCorrect = True 
+			laengengrad = float(input("Geben Sie einen Längengrad ein: "))
+			breitengrad = float(input("Geben Sie einen Breitengrad ein: "))
+			eingabeRichtig = True 
 		except:
 			print("Die Eingabe war fehlerhaft, versuchen Sie es bitte erneut.")
-			inputCorrect = False
-	return (long, lat)
+			eingabeRichtig = False
+	return (laengengrad, breitengrad)
 
-def readBridges():
-	CSV_FILEPATH = "./Zustandsnoten Fernstraßenbrücken 2020-09.csv"
-	with open(file=CSV_FILEPATH, mode="r", encoding="utf-8") as bridgesFile:
-		bridges = [bridge.rstrip() for bridge in bridgesFile.readlines()]
-	return bridges
+def brueckenEinlesen():
+	dateipfad = "./Zustandsnoten Fernstraßenbrücken 2020-09.csv"
+	with open(file=dateipfad, mode="r", encoding="utf-8") as datei:
+		bruecken = [bruecke.rstrip() for bruecke in datei.readlines()]
+	return bruecken
 
-def getNeededHeaderIndexes(bridges):
-	HEADERS = bridges[0].split("\t")
+def spaltenNamen(bruecken):
+	kopfzeile = bruecken[0].split("\t")
 
-	NAME_INDEX = HEADERS.index("Bauwerksname")
-	ORT_INDEX = HEADERS.index("Ort")
-	ZN_INDEX = HEADERS.index("ZN")
-	GML_INDEX = HEADERS.index("Google Maps Link")
-	NB_INDEX = HEADERS.index("NB")
-	OL_INDEX = HEADERS.index("OL")
+	NAME_INDEX = kopfzeile.index("Bauwerksname")
+	ORT_INDEX = kopfzeile.index("Ort")
+	ZN_INDEX = kopfzeile.index("ZN")
+	GML_INDEX = kopfzeile.index("Google Maps Link")
+	NB_INDEX = kopfzeile.index("NB")
+	OL_INDEX = kopfzeile.index("OL")
 
 	return [NAME_INDEX, ORT_INDEX, ZN_INDEX, GML_INDEX, NB_INDEX, OL_INDEX]
 
-def calculateBridgeDistances(bridges, neededHeaderIndexes):
-	bridgesAsDictWithDistace = []
-	for bridge in bridges:
-		bridgeAttributes = bridge.split("\t")
+def berechneDistanzen(bruecken, kopfzeilenIndexe):
+	brueckenMitDistanz = []
+	for bruecke in bruecken:
+		brueckenWerte = bruecke.split("\t")
 
-		NB = float(bridgeAttributes[neededHeaderIndexes[4]].replace(",", "."))
-		OL = float(bridgeAttributes[neededHeaderIndexes[5]].replace(",", "."))
-		bridgeGeoCoords = (NB, OL)
+		NB = float(brueckenWerte[kopfzeilenIndexe[4]].replace(",", "."))
+		OL = float(brueckenWerte[kopfzeilenIndexe[5]].replace(",", "."))
+		brueckeGeokoordinaten = (NB, OL)
 
-		distanceToBridge = round(geodist(userGeoCoords, bridgeGeoCoords), 2)
-		distanceToBridge = str(distanceToBridge) + "km"
+		distanzZurBruecke = round(geodist(eigegebeneKoordinaten, brueckeGeokoordinaten), 2)
+		distanzZurBruecke = str(distanzZurBruecke) + "km"
 		
-		bridgeAsDict = {
+		brueckeAlsDict = {
 			"Rang": 0,
-			"Bauwerksname": bridgeAttributes[neededHeaderIndexes[0]],
-			"Ort": bridgeAttributes[neededHeaderIndexes[1]],
-			"Entfernung": distanceToBridge,
-			"ZN": bridgeAttributes[neededHeaderIndexes[2]],
-			"Bewertung": "/",
-			"Google Maps Link": bridgeAttributes[neededHeaderIndexes[3]]
+			"Bauwerksname": brueckenWerte[kopfzeilenIndexe[0]],
+			"Ort": brueckenWerte[kopfzeilenIndexe[1]],
+			"Entfernung": distanzZurBruecke,
+			"ZN": brueckenWerte[kopfzeilenIndexe[2]],
+			"Google Maps Link": brueckenWerte[kopfzeilenIndexe[3]]
 		}
-		bridgesAsDictWithDistace.append(bridgeAsDict)
-	return bridgesAsDictWithDistace
+		brueckenMitDistanz.append(brueckeAlsDict)
+	return brueckenMitDistanz
 
-def getSevenNearestBridgesToUserCoords(userGeoCoords, bridgesAsDictWithDistace):
-	bridges = sorted(bridgesAsDictWithDistace, key=lambda bridge: bridge["Entfernung"])[:7]
+def naechstenSiebenBruecken(eigegebeneKoordinaten, brueckenMitDistanz):
+	bruecken = sorted(brueckenMitDistanz, key=lambda bruecke: bruecke["Entfernung"])[:7]
 	
 	rang = 0
-	for bridge in bridges:
+	for bruecke in bruecken:
 		rang += 1
-		bridge["Rang"] = rang
-		for key in bridge:
-			print(key + ": " + str(bridge[key]))
+		bruecke["Rang"] = rang
+		for key in bruecke:
+			print(key + ": " + str(bruecke[key]))
 		print("\n")
 
 if __name__ == "__main__":
-	userGeoCoords = getCoordsFromUser()
-	bridges = readBridges()
-	headerIndexes = getNeededHeaderIndexes(bridges)
-	del bridges[0]
-	bridgesAsDictWithDistace = calculateBridgeDistances(bridges, headerIndexes)
-	getSevenNearestBridgesToUserCoords(userGeoCoords, bridgesAsDictWithDistace)
+	einfuehrung()
+	eigegebeneKoordinaten = koordinatenEingabe()
+	bruecken = brueckenEinlesen()
+	headerIndexes = spaltenNamen(bruecken)
+	del bruecken[0]
+	brueckenMitDistanz = berechneDistanzen(bruecken, headerIndexes)
+	naechstenSiebenBruecken(eigegebeneKoordinaten, brueckenMitDistanz)
