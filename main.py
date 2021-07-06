@@ -9,18 +9,18 @@ def einfuehrung():
 def koordinatenEingabe():
     laengengrad = 0
     breitengrad = 0
-	# Kontrollvariable zur Ueberpruefung der Eingabe
+    # Kontrollvariable zur Ueberpruefung der Eingabe
     eingabeRichtig = False
     while not eingabeRichtig:
-		# Versuch die Eingabe in das richtige Format zu bringen
+        # Versuch die Eingabe in das richtige Format zu bringen
         try:
             laengengrad = float(input("Geben Sie einen Längengrad ein: "))
             breitengrad = float(input("Geben Sie einen Breitengrad ein: "))
             eingabeRichtig = True
         except:
-            print("Die Eingabe war fehlerhaft, versuchen Sie es bitte erneut.")
+            print("Die Eingabe war fehlerhaft, versuchen Sie es nochmal.")
             eingabeRichtig = False
-	# gibt einen Tuple mit den Koordinaten zurueck
+    # gibt einen Tuple mit den Koordinaten zurueck
     return (laengengrad, breitengrad)
 
 
@@ -28,18 +28,18 @@ def koordinatenEingabe():
 def brueckenEinlesen():
     dateipfad = "./Zustandsnoten Fernstraßenbrücken 2020-09.csv"
     with open(file=dateipfad, mode="r", encoding="utf-8") as datei:
-		# alle Bruecken, in einer Liste, ohne nachfolgende leerzeichen
+        # alle Bruecken, in einer Liste, ohne nachfolgende leerzeichen
         bruecken = [bruecke.rstrip() for bruecke in datei.readlines()]
-	# Bruecken werden zurueckgegeben
+    # Bruecken werden zurueckgegeben
     return bruecken
 
 
 # gibt die entsprechenden indexe der verschiedenen Spalten aus
 def spaltenIndexe(bruecken):
-	# alle Spaltennamen
+    # alle Spaltennamen
     kopfzeile = bruecken[0].split("\t")
 
-	# Spalten als Zahlen (indexe)
+    # Spalten als Zahlen (indexe)
     NAME_INDEX = kopfzeile.index("Bauwerksname")
     ORT_INDEX = kopfzeile.index("Ort")
     ZN_INDEX = kopfzeile.index("ZN")
@@ -47,32 +47,33 @@ def spaltenIndexe(bruecken):
     NB_INDEX = kopfzeile.index("NB")
     OL_INDEX = kopfzeile.index("OL")
 
-	# zurueckgeben der Spaltenindexe
+    # zurueckgeben der Spaltenindexe
     return [NAME_INDEX, ORT_INDEX, ZN_INDEX, GML_INDEX, NB_INDEX, OL_INDEX]
 
 
 # berechnet alle Distanzen
 def berechneDistanzen(bruecken, kopfzeilenIndexe):
-	# neue Liste mit allen Bruecken, als Dict, und den Distanzen
+    # neue Liste mit allen Bruecken, als Dict, und den Distanzen
     brueckenMitDistanz = []
     for bruecke in bruecken:
-		# alle Werte einer Bruecke als Liste
+        # alle Werte einer Bruecke als Liste
         brueckenWerte = bruecke.split("\t")
 
-		# Koordinaten haben ein Komma aber brauchen einen Punkt
+        # Koordinaten haben ein Komma aber brauchen einen Punkt
         NB = float(brueckenWerte[kopfzeilenIndexe[4]].replace(",", "."))
         OL = float(brueckenWerte[kopfzeilenIndexe[5]].replace(",", "."))
-		# Tuple mit Koordinaten der Bruecke
+        # Tuple mit Koordinaten der Bruecke
         brueckeGeokoordinaten = (NB, OL)
 
-		# Distanz zur Bruecke von unserem eingegebenen Punkt
-		# wird ebenfalls auf zwei Nachkommastellen gerundet
+        # Distanz zur Bruecke von unserem eingegebenen Punkt
+        # wird ebenfalls auf zwei Nachkommastellen gerundet
         distanzZurBruecke = round(
-            geodist(eingegebeneKoordinaten, brueckeGeokoordinaten), 2)
-		# "km" wird zur Distanz angehaengt
+            geodist(eingegebeneKoordinaten, brueckeGeokoordinaten), 2
+        )
+        # "km" wird zur Distanz angehaengt
         distanzZurBruecke = str(distanzZurBruecke) + "km"
 
-		# Werte der Bruecke in ein Dict einfuegen
+        # Werte der Bruecke in ein Dict einfuegen
         brueckeAlsDict = {
             "Rang": 0,
             "Bauwerksname": brueckenWerte[kopfzeilenIndexe[0]],
@@ -81,27 +82,27 @@ def berechneDistanzen(bruecken, kopfzeilenIndexe):
             "ZN": brueckenWerte[kopfzeilenIndexe[2]],
             "Google Maps Link": brueckenWerte[kopfzeilenIndexe[3]],
         }
-		# Dict zur Liste hinzufuegen
+        # Dict zur Liste hinzufuegen
         brueckenMitDistanz.append(brueckeAlsDict)
-	# Liste mit allen Bruecken zurueckgeben
+    # Liste mit allen Bruecken zurueckgeben
     return brueckenMitDistanz
 
 
 # gibt die sieben naechsten Bruecken zurueck
 def naechstenSiebenBruecken(eingegebeneKoordinaten, brueckenMitDistanz):
-	# sortieren der Liste mit den Bruecken als Dict nach dem Schluessel 
-	# Entfernung, absteigend, und gibt uns dann die ersten sieben Ergebnisse
-    bruecken = sorted(brueckenMitDistanz,
-                      key=lambda bruecke: bruecke["Entfernung"])[:7]
-	
-	# Rang definiert
+    # sortieren der Liste mit den Bruecken als Dict nach dem Schluessel
+    # Entfernung, absteigend, und gibt uns dann die ersten sieben Ergebnisse
+    bruecken = sorted(brueckenMitDistanz, 
+					key=lambda bruecke: bruecke["Entfernung"])[:7]
+
+    # Rang definiert
     rang = 0
     for bruecke in bruecken:
-		# Rang wird immer um eins erhoeht
+        # Rang wird immer um eins erhoeht
         rang += 1
-		# Rang Wert der Bruecke wird gesetzt
+        # Rang Wert der Bruecke wird gesetzt
         bruecke["Rang"] = rang
-		# ausgabe der Werte der Bruecke
+        # ausgabe der Werte der Bruecke
         print("\n")
         for key in bruecke:
             print(key + ": " + str(bruecke[key]))
@@ -113,7 +114,7 @@ if __name__ == "__main__":
     eingegebeneKoordinaten = koordinatenEingabe()
     bruecken = brueckenEinlesen()
     headerIndexes = spaltenIndexe(bruecken)
-	# spalten werden geloescht
+    # spalten werden geloescht
     del bruecken[0]
     brueckenMitDistanz = berechneDistanzen(bruecken, headerIndexes)
     naechstenSiebenBruecken(eingegebeneKoordinaten, brueckenMitDistanz)
