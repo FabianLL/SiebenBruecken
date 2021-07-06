@@ -1,8 +1,17 @@
 from geodist import geodist
 
 
+# beschreibt dem Benutzer was das Programm macht
 def einfuehrung():
-    print("")
+    # alle Saetze die ausgegeben werden sollen
+    saetze = [
+        "Dieses Programm ermittelt zu einem Geokoordinatenpaar innerhalb",
+        "Deutschlands (z.B. 51.447918, 7.270694) die sieben nächstliegenden",
+        "Fernstraßenbrücken und gibt ihre Position, ihren Zustand und einen",
+        "Link auf eine Onlinekarte aus.",
+    ]
+    # fuegt alle Saetze mit einem Zeilenumruch zusammen
+    print("\n".join(saetze), "\n")
 
 
 # nimmt das Koordinatenpaar vom Benutzer entgegen
